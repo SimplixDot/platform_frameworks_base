@@ -4098,6 +4098,12 @@ public final class Settings {
          */
         public static final String SHOW_BATTERY_PERCENT = "status_bar_show_battery_percent";
 
+		/**
+         * Whether to display qs tile titles in the qs panel
+         * @hide
+         */
+        public static final String QS_TILE_TITLE_VISIBILITY = "qs_tile_title_visibility";
+
         /** @hide */
         public static final Validator SHOW_BATTERY_PERCENT_VALIDATOR =
                 new InclusiveIntegerRangeValidator(0, 2);
@@ -4548,6 +4554,14 @@ public final class Settings {
          * Whether to use icon pack for Recents
          * @hide
          */
+         
+        /**
+        * Whether to change the transparency of the qs panel
+        * @hide
+        */
+        public static final String QS_PANEL_BG_ALPHA = "qs_panel_bg_alpha";
+        
+        
         public static final String RECENTS_ICON_PACK = "recents_icon_pack";
 
         /**

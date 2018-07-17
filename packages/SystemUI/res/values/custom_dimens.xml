@@ -42,6 +42,9 @@
     <!-- Screenrecord -->
     <dimen name="screenrecord_hint_size">48dp</dimen>
 
+	<!-- QS Tile title -->
+    <dimen name="qs_tile_height_wo_label">48dp</dimen>
+
     <!-- Status bar notification ticker -->
     <dimen name="ticker_start_padding">6dp</dimen>
     <dimen name="ticker_icon_end_margin">4dp</dimen>
