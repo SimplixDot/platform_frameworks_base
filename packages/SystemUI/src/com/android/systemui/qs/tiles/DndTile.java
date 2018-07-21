@@ -118,6 +118,11 @@ public class DndTile extends QSTileImpl<BooleanState> {
     public DetailAdapter getDetailAdapter() {
         return mDetailAdapter;
     }
+    
+    @Override
+    public boolean isDualTarget() {
+    	return true;
+    }
 
     @Override
     public BooleanState newTileState() {

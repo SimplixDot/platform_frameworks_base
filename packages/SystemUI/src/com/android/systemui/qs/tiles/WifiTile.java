@@ -102,6 +102,11 @@ public class WifiTile extends QSTileImpl<SignalState> {
     protected DetailAdapter createDetailAdapter() {
         return new WifiDetailAdapter();
     }
+    
+    @Override
+    public boolean isDualTarget() {
+    	return true;
+    }
 
     @Override
     public QSIconView createTileView(Context context) {
