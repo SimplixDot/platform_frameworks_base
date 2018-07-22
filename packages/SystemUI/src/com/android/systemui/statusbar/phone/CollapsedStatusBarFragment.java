@@ -24,6 +24,7 @@ import android.app.Fragment;
 import android.app.StatusBarManager;
 import android.content.ContentResolver;
 import android.database.ContentObserver;
+import android.graphics.drawable.Drawable;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -92,6 +93,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     private ImageView mCOSMICLogoRight;
 
     private int mShowLogo;
+    private int mLogoType;
 
     private NetworkTraffic mNetworkTraffic;
 
@@ -162,6 +164,9 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
                     Settings.System.STATUS_BAR_LOGO),
                     false, this, UserHandle.USER_ALL);
             mContentResolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_LOGO_TYPE),
+                    false, this, UserHandle.USER_ALL);
+            mContentResolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_SHOW_CARRIER),
                     false, this, UserHandle.USER_ALL);
         }
@@ -188,9 +193,24 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         mShowLogo = Settings.System.getIntForUser(
                 getContext().getContentResolver(), Settings.System.STATUS_BAR_LOGO, 0,
                 UserHandle.USER_CURRENT);
+        mLogoType = Settings.System.getIntForUser(
+                getContext().getContentResolver(), Settings.System.STATUS_BAR_LOGO_TYPE, 0,
+                UserHandle.USER_CURRENT);
         mShowCarrierLabel = Settings.System.getIntForUser(
                 getContext().getContentResolver(), Settings.System.STATUS_BAR_SHOW_CARRIER, 1,
                 UserHandle.USER_CURRENT);
+                
+        if (mLogoType == 0) {
+        	mCOSMICLogo.setImageDrawable(getResources().getDrawable(R.drawable.ic_status_bar_cosmic_logo));
+        	mCOSMICLogoRight.setImageDrawable(getResources().getDrawable(R.drawable.ic_status_bar_cosmic_logo));
+        } else if (mLogoType == 1) {
+        	mCOSMICLogo.setImageDrawable(getResources().getDrawable(R.drawable.cat));
+        	mCOSMICLogoRight.setImageDrawable(getResources().getDrawable(R.drawable.cat));
+        } else if (mLogoType == 2) {
+        	mCOSMICLogo.setImageDrawable(getResources().getDrawable(R.drawable.whale));
+        	mCOSMICLogoRight.setImageDrawable(getResources().getDrawable(R.drawable.whale));
+        }
+        
         if (mNotificationIconAreaInner != null) {
             if (mShowLogo == 1) {
                 if (mNotificationIconAreaInner.getVisibility() == View.VISIBLE) {

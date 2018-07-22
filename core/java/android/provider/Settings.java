@@ -4443,6 +4443,11 @@ public final class Settings {
          * @hide
          */
         public static final String STATUS_BAR_LOGO = "status_bar_logo";
+        
+        /**
+         * @hide
+         */
+        public static final String STATUS_BAR_LOGO_TYPE = "status_bar_logo_type";
 
         /**
          * Whether to change the color of settings icons
