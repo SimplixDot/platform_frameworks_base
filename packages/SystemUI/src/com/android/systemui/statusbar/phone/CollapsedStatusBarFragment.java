@@ -191,13 +191,13 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
                 UserHandle.USER_CURRENT);
                 initTickerView();
         mShowLogo = Settings.System.getIntForUser(
-                getContext().getContentResolver(), Settings.System.STATUS_BAR_LOGO, 0,
+                getContext().getContentResolver(), Settings.System.STATUS_BAR_LOGO, 1,
                 UserHandle.USER_CURRENT);
         mLogoType = Settings.System.getIntForUser(
                 getContext().getContentResolver(), Settings.System.STATUS_BAR_LOGO_TYPE, 0,
                 UserHandle.USER_CURRENT);
         mShowCarrierLabel = Settings.System.getIntForUser(
-                getContext().getContentResolver(), Settings.System.STATUS_BAR_SHOW_CARRIER, 1,
+                getContext().getContentResolver(), Settings.System.STATUS_BAR_SHOW_CARRIER, 2,
                 UserHandle.USER_CURRENT);
                 
         if (mLogoType == 0) {

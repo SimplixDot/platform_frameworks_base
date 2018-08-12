@@ -84,11 +84,11 @@ public class TileLayout extends ViewGroup implements QSTileLayout {
         final int columns;
         if (res.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             columns = Math.max(1, Settings.System.getIntForUser(resolver,
-                    Settings.System.QS_COLUMNS_PORTRAIT, 5,
+                    Settings.System.QS_COLUMNS_PORTRAIT, 6,
                     UserHandle.USER_CURRENT));
         } else {
             columns = Math.max(1, Settings.System.getIntForUser(resolver,
-                    Settings.System.QS_COLUMNS_LANDSCAPE, 5,
+                    Settings.System.QS_COLUMNS_LANDSCAPE, 6,
                     UserHandle.USER_CURRENT));
         }
         boolean showTitles = Settings.System.getIntForUser(resolver,
