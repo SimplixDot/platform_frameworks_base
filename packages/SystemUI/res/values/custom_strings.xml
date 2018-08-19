@@ -45,6 +45,13 @@
     <string name="accessibility_quick_settings_heads_up_on">Heads up on.</string>
     <string name="accessibility_quick_settings_heads_up_changed_off">Heads up turned off.</string>
     <string name="accessibility_quick_settings_heads_up_changed_on">Heads up turned on.</string>
+    
+    <!-- Game Mode QS Tile -->
+    <string name="quick_settings_gamemode_label">Game Mode</string>
+    
+    <!-- Game Mode Splash -->
+    <string name="gamemode_splash_title">Game Mode</string>
+    <string name="gamemode_splash_summary">Game Mode will hide all peeking notifications when you play your favorite games. All you have to do is flip the Quick Setting toggle and enjoy the immersive gaming experience.</string>
 
      <!-- Sound QS Tile -->
      <string name="quick_settings_sound_label">Sound</string>

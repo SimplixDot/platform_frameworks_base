@@ -35,6 +35,7 @@ import com.android.systemui.qs.tiles.DndTile;
 import com.android.systemui.qs.tiles.FlashlightTile;
 import com.android.systemui.qs.tiles.HeadsUpTile;
 import com.android.systemui.qs.tiles.HotspotTile;
+import com.android.systemui.qs.tiles.GamemodeTile;
 import com.android.systemui.qs.tiles.HWKeysTile;
 import com.android.systemui.qs.tiles.IntentTile;
 import com.android.systemui.qs.tiles.LocaleTile;
@@ -76,6 +77,7 @@ public class QSFactoryImpl implements QSFactory {
         else if (tileSpec.equals("location")) return new LocationTile(mHost);
         else if (tileSpec.equals("cast")) return new CastTile(mHost);
         else if (tileSpec.equals("hotspot")) return new HotspotTile(mHost);
+        else if (tileSpec.equals("gamemode")) return new GamemodeTile(mHost);
         else if (tileSpec.equals("user")) return new UserTile(mHost);
         else if (tileSpec.equals("battery")) return new BatterySaverTile(mHost);
         else if (tileSpec.equals("saver")) return new DataSaverTile(mHost);

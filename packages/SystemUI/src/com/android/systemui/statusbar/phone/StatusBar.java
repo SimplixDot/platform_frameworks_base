@@ -8381,6 +8381,11 @@ public class StatusBar extends SystemUI implements DemoMode,
             if (DEBUG) Log.d(TAG, "No peeking: snoozed package: " + sbn.getKey());
             return false;
         }
+        
+        if (Settings.System.getIntForUser(mContext.getContentResolver(), Settings.System.GAMEMODE_ENABLED, 0, mCurrentUserId)==1) {
+        	if (DEBUG) Log.d(TAG, "No peeking: GameMode enabled: " + sbn.getKey());
+        	return false;
+        }
 
         // Allow peeking for DEFAULT notifications only if we're on Ambient Display.
         int importanceLevel = isDozing() ? NotificationManager.IMPORTANCE_DEFAULT

@@ -4432,6 +4432,12 @@ public final class Settings {
          * @hide
          */
         public static final String SCREENRECORD_QUALITY_MODE = "screenrecord_quality_mode";
+        
+        /**
+         * Whether to hide annoying notifications during gameplay
+         * @hide
+         */
+        public static final String GAMEMODE_ENABLED = "gamemode_enabled";
 
         /**
          * Whether to show the notification ticker on the status bar
