@@ -1473,7 +1473,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                     if (NotificationPanelView.mKeyguardShowing) {
                         return;
                     }
-                    RecentsActivity.onConfigurationChanged();
+                    
                     String action = intent.getAction();
                 if (action.equals(Intent.ACTION_CONFIGURATION_CHANGED)) {
                         if (NotificationPanelView.mKeyguardShowing) {
@@ -1489,7 +1489,7 @@ public class StatusBar extends SystemUI implements DemoMode,
              IntentFilter intent = new IntentFilter();
             intent.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
             this.mContext.registerReceiver(receiver, intent);
-             //RecentsActivity.init(this.mContext);
+             RecentsActivity.init(this.mContext);
              updatePreferences();
         } catch (Exception e){
             Log.d("mango918", String.valueOf(e));
