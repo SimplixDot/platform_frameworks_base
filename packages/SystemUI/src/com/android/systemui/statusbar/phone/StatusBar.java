@@ -1491,7 +1491,7 @@ public class StatusBar extends SystemUI implements DemoMode,
             intent.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
             this.mContext.registerReceiver(receiver, intent);
              RecentsActivity.init(this.mContext);
-             updatePreferences();
+             updatePreferences(mContext);
         } catch (Exception e){
             Log.d("mango918", String.valueOf(e));
         }
@@ -6683,9 +6683,6 @@ public class StatusBar extends SystemUI implements DemoMode,
                     Settings.System.TRANSLUCENT_NOTIFICATIONS_PREFERENCE_KEY), 
                     false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.TRANSLUCENT_QUICK_SETTINGS_PRECENTAGE_PREFERENCE_KEY), 
-                    false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.TRANSLUCENT_NOTIFICATIONS_PRECENTAGE_PREFERENCE_KEY), 
                     false, this, UserHandle.USER_ALL);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -6820,18 +6817,15 @@ public class StatusBar extends SystemUI implements DemoMode,
     }
 
 	private void updateBlurSettings() {
+			ContentResolver resolver = mContext.getContentResolver();
             mBlurScale = Settings.System.getInt(mContext.getContentResolver(),
                     Settings.System.BLUR_SCALE_PREFERENCE_KEY, 10);
             mBlurRadius = Settings.System.getInt(mContext.getContentResolver(),
                     Settings.System.BLUR_RADIUS_PREFERENCE_KEY, 5);
-            mTranslucentQuickSettings =  Settings.System.getIntForUser(resolver,
-                    Settings.System.TRANSLUCENT_QUICK_SETTINGS_PREFERENCE_KEY, 0, UserHandle.USER_CURRENT) == 1;
             mBlurredStatusBarExpandedEnabled = Settings.System.getIntForUser(resolver,
                     Settings.System.STATUS_BAR_EXPANDED_ENABLED_PREFERENCE_KEY, 0, UserHandle.USER_CURRENT) == 1;
             mTranslucentNotifications = Settings.System.getIntForUser(resolver,
                     Settings.System.TRANSLUCENT_NOTIFICATIONS_PREFERENCE_KEY, 0, UserHandle.USER_CURRENT) == 1;
-            mQSTranslucencyPercentage = Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.TRANSLUCENT_QUICK_SETTINGS_PRECENTAGE_PREFERENCE_KEY, 60);
             mNotTranslucencyPercentage = Settings.System.getInt(mContext.getContentResolver(),
                     Settings.System.TRANSLUCENT_NOTIFICATIONS_PRECENTAGE_PREFERENCE_KEY, 70);
             mBlurredRecents = Settings.System.getIntForUser(resolver,
@@ -8688,7 +8682,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
     };
     
-    public static void updatePreferences() {
+    public static void updatePreferences(Context mContext) {
     	RecentsActivity.updatePreferences(mContext);
          if (mNotificationData == null)
             return;
