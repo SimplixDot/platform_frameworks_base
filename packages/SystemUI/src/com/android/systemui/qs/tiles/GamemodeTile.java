@@ -38,6 +38,8 @@ import com.android.systemui.R;
 public class GamemodeTile extends QSTileImpl<BooleanState> {
 	private final Icon mIcon = ResourceIcon.get(R.drawable.ic_gamemode);
 	private int mEnabled;
+	private boolean mNavbarVisible;
+	private boolean mButtonsEnabled;
 	
 	public GamemodeTile(QSHost host) {
         super(host);
@@ -75,8 +77,28 @@ public class GamemodeTile extends QSTileImpl<BooleanState> {
     private void switchEnabled() {
     	if (mEnabled == 0) {
     		mEnabled = 1;
+    		mNavbarVisible = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+					                Settings.Secure.NAVIGATION_BAR_VISIBLE, 0,
+                					UserHandle.USER_CURRENT) == 1;
+    		mButtonsEnabled = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+					                Settings.Secure.HARDWARE_KEYS_DISABLE, 0,
+                					UserHandle.USER_CURRENT) == 0;
+			Settings.Secure.putIntForUser(mContext.getContentResolver(),
+    	            Settings.Secure.NAVIGATION_BAR_VISIBLE, 0,
+	                UserHandle.USER_CURRENT);
+	        Settings.Secure.putIntForUser(mContext.getContentResolver(),
+    	            Settings.Secure.HARDWARE_KEYS_DISABLE, 1,
+	                UserHandle.USER_CURRENT);
     	} else {
     		mEnabled = 0;
+    		if (mNavbarVisible)
+    		Settings.Secure.putIntForUser(mContext.getContentResolver(),
+    	            Settings.Secure.NAVIGATION_BAR_VISIBLE, 1,
+	                UserHandle.USER_CURRENT);
+	        if (mButtonsEnabled)
+	        Settings.Secure.putIntForUser(mContext.getContentResolver(),
+    	            Settings.Secure.HARDWARE_KEYS_DISABLE, 0,
+	                UserHandle.USER_CURRENT);
     	}
     	Settings.System.putIntForUser(mContext.getContentResolver(),
                 Settings.System.GAMEMODE_ENABLED, mEnabled,
