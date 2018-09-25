@@ -482,6 +482,7 @@ public class StatusBar extends SystemUI implements DemoMode,
     private boolean mAutohideSuspended;
     private int mStatusBarMode;
     private int mMaxKeyguardNotifications;
+    protected int mCurrentUserId = 0;
 
     private ViewMediatorCallback mKeyguardViewMediatorCallback;
     protected ScrimController mScrimController;
@@ -1928,6 +1929,15 @@ public class StatusBar extends SystemUI implements DemoMode,
             if (userPublic && needsRedaction) {
                 return false;
             }
+        }
+        
+        mCurrentUserId = ActivityManager.getCurrentUser();
+        
+        if (Settings.System.getIntForUser(mContext.getContentResolver(), Settings.System.GAMEMODE_ENABLED, 0, mCurrentUserId)==1) {
+        	if (DEBUG) {
+        		Log.d(TAG, "No peeking: GameMode enabled: " + sbn.getKey());
+        	}
+        	return false;
         }
 
         if (!panelsEnabled()) {

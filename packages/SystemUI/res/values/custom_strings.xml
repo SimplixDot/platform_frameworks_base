@@ -58,6 +58,9 @@
     <string name="quick_settings_power_details_title">Reboot modes</string>
     <string name="quick_settings_power_off">Power off</string>
     <string name="quick_settings_preferences">Preferences</string>
+    
+    <!-- Game Mode QS Tile -->
+    <string name="quick_settings_gamemode_label">Game Mode</string>
 
     <!-- QS Colums -->
     <string name="qs_menu_item_columns">Portrait columns</string>
