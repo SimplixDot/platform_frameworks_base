@@ -535,6 +535,8 @@ public class StatusBar extends SystemUI implements DemoMode,
     private PowerManager.WakeLock mGestureWakeLock;
     private Vibrator mVibrator;
     private long[] mCameraLaunchGestureVibePattern;
+    
+    private boolean mFpDismissNotifications;
 
     private final int[] mTmpInt2 = new int[2];
 
@@ -795,6 +797,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         updateDisplaySize(); // populates mDisplayMetrics
         updateResources();
         updateTheme();
+        setFpToDismissNotifications();
 
         inflateStatusBarWindow(context);
         mStatusBarWindow.setService(this);
@@ -1215,6 +1218,10 @@ public class StatusBar extends SystemUI implements DemoMode,
     }
 
     public void clearAllNotifications() {
+    	clearAllNotifications(false);
+    }
+     
+    private void clearAllNotifications(boolean forceToLeft) {
         // animate-swipe all dismissable notifications, then animate the shade closed
         int numChildren = mStackScroller.getChildCount();
 
@@ -1273,11 +1280,11 @@ public class StatusBar extends SystemUI implements DemoMode,
             }
         });
 
-        performDismissAllAnimations(viewsToHide);
+        performDismissAllAnimations(viewsToHide, forceToLeft);
 
     }
 
-    private void performDismissAllAnimations(ArrayList<View> hideAnimatedList) {
+    private void performDismissAllAnimations(ArrayList<View> hideAnimatedList, boolean forceToLeft) {
         Runnable animationFinishAction = () -> {
             animateCollapsePanels(CommandQueue.FLAG_EXCLUDE_NONE);
         };
@@ -1302,7 +1309,7 @@ public class StatusBar extends SystemUI implements DemoMode,
             if (i == 0) {
                 endRunnable = animationFinishAction;
             }
-            mStackScroller.dismissViewAnimated(view, endRunnable, totalDelay, 260);
+            mStackScroller.dismissViewAnimated(view, endRunnable, totalDelay, 260, forceToLeft);
             currentDelay = Math.max(50, currentDelay - rowDelayDecrement);
             totalDelay += currentDelay;
         }
@@ -2079,6 +2086,28 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
         return themeInfo != null && themeInfo.isEnabled();
     }
+    
+    public boolean isUsingBlackTheme() {
+        OverlayInfo themeInfo = null;
+        try {
+            themeInfo = mOverlayManager.getOverlayInfo("com.android.system.theme.black",
+                    mLockscreenUserManager.getCurrentUserId());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return themeInfo != null && themeInfo.isEnabled();
+    }
+    
+    public boolean isUsingSimplixTheme() {
+        OverlayInfo themeInfo = null;
+        try {
+            themeInfo = mOverlayManager.getOverlayInfo("com.android.system.theme.simplix",
+                    mLockscreenUserManager.getCurrentUserId());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        return themeInfo != null && themeInfo.isEnabled();
+    }
 
     @Nullable
     public View getAmbientIndicationContainer() {
@@ -2214,6 +2243,12 @@ public class StatusBar extends SystemUI implements DemoMode,
             } else if (!mNotificationPanel.isInSettings() && !mNotificationPanel.isExpanding()){
                 mNotificationPanel.flingSettings(0 /* velocity */, true /* expand */);
                 mMetricsLogger.count(NotificationPanelView.COUNTER_PANEL_OPEN_QS, 1);
+            }
+        } else if (mFpDismissNotifications && (KeyEvent.KEYCODE_SYSTEM_NAVIGATION_LEFT == key
+                || KeyEvent.KEYCODE_SYSTEM_NAVIGATION_RIGHT == key)) {
+            if (!mNotificationPanel.isFullyCollapsed() && !mNotificationPanel.isExpanding()){
+                mMetricsLogger.action(MetricsEvent.ACTION_DISMISS_ALL_NOTES);
+                clearAllNotifications(KeyEvent.KEYCODE_SYSTEM_NAVIGATION_LEFT == key ? true : false);
             }
         }
 
@@ -3849,6 +3884,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
         mNotificationPanel.setBarState(mState, mKeyguardFadingAway, goingToFullShade);
         updateTheme();
+        setFpToDismissNotifications();
         updateDozingState();
         updatePublicMode();
         updateStackScrollerState(goingToFullShade, fromShadeLocked);
@@ -3868,11 +3904,25 @@ public class StatusBar extends SystemUI implements DemoMode,
     protected void updateTheme() {
         final boolean inflated = mStackScroller != null;
 
-        // The system wallpaper defines if QS should be light or dark.
-        WallpaperColors systemColors = mColorExtractor
-                .getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
-        final boolean useDarkTheme = systemColors != null
-                && (systemColors.getColorHints() & WallpaperColors.HINT_SUPPORTS_DARK_THEME) != 0;
+        int userThemeSetting = Settings.Secure.getInt(mContext.getContentResolver(),
+                Settings.Secure.THEME_MODE, 4);
+        boolean useDarkTheme;
+        boolean useBlackTheme;
+        boolean useSimplixTheme;
+        if (userThemeSetting == 0) {
+            // The system wallpaper defines if QS should be light or dark.
+            WallpaperColors systemColors = mColorExtractor
+                    .getWallpaperColors(WallpaperManager.FLAG_SYSTEM);
+            useDarkTheme = systemColors != null
+                    && (systemColors.getColorHints() & WallpaperColors.HINT_SUPPORTS_DARK_THEME) != 0;
+            useBlackTheme = false;
+            useSimplixTheme = false;
+        } else {
+            useDarkTheme = userThemeSetting == 2;
+            useBlackTheme = userThemeSetting == 3;
+            useSimplixTheme = userThemeSetting == 4;
+        }
+        Log.i(TAG, "updating themes hold on...");
         if (isUsingDarkTheme() != useDarkTheme) {
             mUiOffloadThread.submit(() -> {
                 try {
@@ -3882,8 +3932,35 @@ public class StatusBar extends SystemUI implements DemoMode,
                             useDarkTheme, mLockscreenUserManager.getCurrentUserId());
                     mOverlayManager.setEnabled("com.android.settings.theme.dark",
                             useDarkTheme, mLockscreenUserManager.getCurrentUserId());
-                    mOverlayManager.setEnabled("com.android.gboard.theme.dark",
-                            useDarkTheme, mLockscreenUserManager.getCurrentUserId());
+                    Log.i(TAG, "theme updated to dark");
+                } catch (RemoteException e) {
+                    Log.w(TAG, "Can't change theme", e);
+                }
+            });
+        }
+        if (isUsingBlackTheme() != useBlackTheme) {
+            mUiOffloadThread.submit(() -> {
+                try {
+                	Log.i(TAG, "is black...");
+                    mOverlayManager.setEnabled("com.android.system.theme.black",
+                            useBlackTheme, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.settings.theme.black",
+                            useBlackTheme, mLockscreenUserManager.getCurrentUserId());
+                    Log.i(TAG, "theme updated to black");
+                } catch (RemoteException e) {
+                    Log.w(TAG, "Can't change theme", e);
+                }
+            });
+        }
+        if (isUsingSimplixTheme() != useSimplixTheme) {
+            mUiOffloadThread.submit(() -> {
+                try {
+                	Log.i(TAG, "is simplix...");
+                    mOverlayManager.setEnabled("com.android.system.theme.simplix",
+                            useSimplixTheme, mLockscreenUserManager.getCurrentUserId());
+                    mOverlayManager.setEnabled("com.android.settings.theme.simplix",
+                            useSimplixTheme, mLockscreenUserManager.getCurrentUserId());
+                    Log.i(TAG, "theme updated to simplix");
                 } catch (RemoteException e) {
                     Log.w(TAG, "Can't change theme", e);
                 }
@@ -4082,6 +4159,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         updateReportRejectedTouchVisibility();
         updateDozing();
         updateTheme();
+        setFpToDismissNotifications();
         touchAutoDim();
         mNotificationShelf.setStatusBarState(state);
     }
@@ -4228,6 +4306,12 @@ public class StatusBar extends SystemUI implements DemoMode,
     @Override
     public boolean isFalsingCheckNeeded() {
         return mState == StatusBarState.KEYGUARD;
+    }
+    
+    private void setFpToDismissNotifications() {
+        mFpDismissNotifications = Settings.Secure.getIntForUser(mContext.getContentResolver(),
+                Settings.Secure.FP_SWIPE_TO_DISMISS_NOTIFICATIONS, 0,
+                UserHandle.USER_CURRENT) == 1;
     }
 
     /**

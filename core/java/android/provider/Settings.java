@@ -7266,11 +7266,13 @@ public final class Settings {
         public static final String UI_NIGHT_MODE = "ui_night_mode";
 
         /**
-         * The current device UI theme mode effect SystemUI and Launcher.<br/>
-         * <b>Values:</b><br/>
-         * 0 - The mode that theme will controlled by wallpaper color.<br/>
-         * 1 - The mode that will always light theme.<br/>
-         * 2 - The mode that will always dark theme.<br/>
+         * The current device UI theme mode effect SystemUI and Launcher.
+         * Values:
+         * 0 - The mode that theme will controlled by wallpaper color.
+         * 1 - The mode that will always light theme.
+         * 2 - The mode that will always dark theme.
+         * 3 - The mode that will always black theme.
+         * 4 - Simplix Blue Theme
          *
          * @hide
          */
@@ -7293,6 +7295,18 @@ public final class Settings {
          * @hide
          */
         public static final int THEME_MODE_DARK = 2;
+        
+        /**
+         * THEME_MODE value for black theme mode.
+         * @hide
+         */
+        public static final int THEME_MODE_BLACK = 3;
+        
+        /**
+         * THEME_MODE value for Simplix Blue theme mode.
+         * @hide
+         */
+        public static final int THEME_MODE_SIMPLIX = 4;
 
         /**
          * Whether screensavers are enabled.
@@ -7894,6 +7908,12 @@ public final class Settings {
                 "system_navigation_keys_enabled";
 
         private static final Validator SYSTEM_NAVIGATION_KEYS_ENABLED_VALIDATOR = BOOLEAN_VALIDATOR;
+        
+        /**
+         * Wheter to dismiss notifications on fingerprint left and right swipe action
+         * @hide
+         */
+        public static final String FP_SWIPE_TO_DISMISS_NOTIFICATIONS = "fp_swipe_to_dismiss_notifications";
 
         /**
          * Holds comma separated list of ordering of QS tiles.
