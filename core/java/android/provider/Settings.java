@@ -4248,6 +4248,12 @@ public final class Settings {
          * @hide
          */
         public static final String QS_TILE_HIDE_TITLE = "qs_tile_hide_title";
+        
+        /**
+         * Whether navigation bar is enabled or not
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_SHOW = "navigation_bar_show";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
