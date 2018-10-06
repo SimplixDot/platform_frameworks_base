@@ -3100,7 +3100,14 @@ public final class Settings {
          * @hide
          */
          
-        public static final String FP_UNLOCK_KEYSTORE = "fp_unlock_keystore";
+        /**
+         * Whether to use the custom quick unlock screen control
+         * @hide
+         */
+        public static final String LOCKSCREEN_QUICK_UNLOCK_CONTROL =
+                "lockscreen_quick_unlock_control";
+		 
+		 public static final String FP_UNLOCK_KEYSTORE = "fp_unlock_keystore";
 
         /**
          * A formatted string of the next alarm that is set, or the empty string
