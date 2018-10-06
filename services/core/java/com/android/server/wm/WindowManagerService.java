@@ -6129,6 +6129,11 @@ public class WindowManagerService extends IWindowManager.Stub
     public boolean hasNavigationBar() {
         return mPolicy.hasNavigationBar();
     }
+    
+    @Override
+    public void sendCustomAction(Intent intent) {
+        mPolicy.sendCustomAction(intent);
+    }
 
     @Override
     public void lockNow(Bundle options) {

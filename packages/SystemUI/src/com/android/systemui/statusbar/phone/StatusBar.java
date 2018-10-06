@@ -89,6 +89,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Process;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
@@ -139,6 +140,11 @@ import com.android.internal.statusbar.IStatusBarService;
 import com.android.internal.statusbar.NotificationVisibility;
 import com.android.internal.statusbar.StatusBarIcon;
 import com.android.internal.util.simplix.DeviceUtils;
+import com.android.internal.util.hwkeys.ActionConstants;
+import com.android.internal.util.hwkeys.ActionUtils;
+import com.android.internal.util.hwkeys.PackageMonitor;
+import com.android.internal.util.hwkeys.PackageMonitor.PackageChangedListener;
+import com.android.internal.util.hwkeys.PackageMonitor.PackageState;
 import com.android.internal.widget.LockPatternUtils;
 import com.android.internal.widget.MessagingGroup;
 import com.android.internal.widget.MessagingMessage;
@@ -229,6 +235,7 @@ import com.android.systemui.statusbar.policy.DarkIconDispatcher;
 import com.android.systemui.statusbar.policy.DeviceProvisionedController;
 import com.android.systemui.statusbar.policy.DeviceProvisionedController.DeviceProvisionedListener;
 import com.android.systemui.statusbar.policy.ExtensionController;
+import com.android.systemui.statusbar.policy.FlashlightController;
 import com.android.systemui.statusbar.policy.HeadsUpManager;
 import com.android.systemui.statusbar.policy.HeadsUpUtil;
 import com.android.systemui.statusbar.policy.KeyguardMonitor;
@@ -255,7 +262,7 @@ import java.util.Map;
 public class StatusBar extends SystemUI implements DemoMode,
         DragDownHelper.DragDownCallback, ActivityStarter, OnUnlockMethodChangedListener,
         OnHeadsUpChangedListener, CommandQueue.Callbacks, ZenModeController.Callback,
-        ColorExtractor.OnColorsChangedListener, ConfigurationListener, NotificationPresenter {
+        ColorExtractor.OnColorsChangedListener, ConfigurationListener, NotificationPresenter, PackageChangedListener {
     public static final boolean MULTIUSER_DEBUG = false;
 
     public static final boolean ENABLE_CHILD_NOTIFICATIONS
@@ -357,8 +364,6 @@ public class StatusBar extends SystemUI implements DemoMode,
 
     private PhoneStatusBarPolicy mIconPolicy;
     private StatusBarSignalPolicy mSignalPolicy;
-    
-    mNavigationBarObserver.observe();
 
     private VolumeComponent mVolumeComponent;
     private BrightnessMirrorController mBrightnessMirrorController;
@@ -446,6 +451,8 @@ public class StatusBar extends SystemUI implements DemoMode,
     private int mLastDispatchedSystemUiVisibility = ~View.SYSTEM_UI_FLAG_VISIBLE;
 
     private final DisplayMetrics mDisplayMetrics = new DisplayMetrics();
+    
+    private PackageMonitor mPackageMonitor;
 
     // XXX: gesture research
     private final GestureRecorder mGestureRec = DEBUG_GESTURES
@@ -610,6 +617,7 @@ public class StatusBar extends SystemUI implements DemoMode,
         }
     };
 
+	private FlashlightController mFlashlightController;
     private KeyguardUserSwitcher mKeyguardUserSwitcher;
     protected UserSwitcherController mUserSwitcherController;
     private NetworkController mNetworkController;
@@ -697,6 +705,10 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         mDisplay = mWindowManager.getDefaultDisplay();
         updateDisplaySize();
+        
+        mPackageMonitor = new PackageMonitor();
+        mPackageMonitor.register(mContext, mHandler);
+        mPackageMonitor.addListener(this);
 
         Resources res = mContext.getResources();
         mVibrateOnOpening = mContext.getResources().getBoolean(
@@ -811,6 +823,8 @@ public class StatusBar extends SystemUI implements DemoMode,
         // Lastly, call to the icon policy to install/update all the icons.
         mIconPolicy = new PhoneStatusBarPolicy(mContext, mIconController);
         mSignalPolicy = new StatusBarSignalPolicy(mContext, mIconController);
+        
+        mNavigationBarObserver.observe();
 
         mUnlockMethodCache = UnlockMethodCache.getInstance(mContext);
         mUnlockMethodCache.addListener(this);
@@ -1106,6 +1120,8 @@ public class StatusBar extends SystemUI implements DemoMode,
 
         // Private API call to make the shadows look better for Recents
         ThreadedRenderer.overrideProperty("ambientRatio", String.valueOf(1.5f));
+        
+        mFlashlightController = Dependency.get(FlashlightController.class);
     }
 
     protected void createNavigationBar() {
@@ -2315,6 +2331,16 @@ public class StatusBar extends SystemUI implements DemoMode,
         mScreenPinningNotify.showEscapeToast(getNavigationBarView() == null
                 || getNavigationBarView().isRecentsButtonVisible());
     }
+    
+    @Override
+    public void toggleCameraFlash() {
+        if (DEBUG) {
+            Log.d(TAG, "Toggling camera flashlight");
+        }
+        if (mFlashlightController.isAvailable()) {
+            mFlashlightController.setFlashlight(!mFlashlightController.isEnabled());
+        }
+    }
 
     boolean panelsEnabled() {
         return (mDisabled1 & StatusBarManager.DISABLE_EXPAND) == 0
@@ -2939,6 +2965,10 @@ public class StatusBar extends SystemUI implements DemoMode,
         for (Map.Entry<String, ?> entry : Prefs.getAll(mContext).entrySet()) {
             pw.print("  "); pw.print(entry.getKey()); pw.print("="); pw.println(entry.getValue());
         }
+        
+        if (mFlashlightController != null) {
+            mFlashlightController.dump(fd, pw, args);
+        }
     }
 
     static void dumpBarTransitions(PrintWriter pw, String var, BarTransitions transitions) {
@@ -3494,6 +3524,28 @@ public class StatusBar extends SystemUI implements DemoMode,
         Dependency.get(ConfigurationController.class).removeCallback(this);
         mZenController.removeCallback(this);
         mAppOpsListener.destroy();
+        mPackageMonitor.removeListener(this);
+        mPackageMonitor.unregister();
+    }
+     
+    @Override
+    public void onPackageChanged(String pkg, PackageState state) {
+        if (state == PackageState.PACKAGE_REMOVED
+                || state == PackageState.PACKAGE_CHANGED) {
+            final Context ctx = mContext;
+            final Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if (!ActionUtils.hasNavbarByDefault(ctx)) {
+                        ActionUtils.resolveAndUpdateButtonActions(ctx,
+                                ActionConstants
+                                        .getDefaults(ActionConstants.HWKEYS));
+                    }
+                }
+            });
+            thread.setPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            thread.start();
+        }
     }
 
     private boolean mDemoModeAllowed;
