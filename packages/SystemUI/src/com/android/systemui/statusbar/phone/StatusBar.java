@@ -499,12 +499,19 @@ public class StatusBar extends SystemUI implements DemoMode,
             mContext.getContentResolver().registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_BAR_SHOW),
                     false, this, UserHandle.USER_ALL);
+            mContext.getContentResolver().registerContentObserver(Settings.Secure.getUriFor(
+                    Settings.Secure.FP_SWIPE_TO_DISMISS_NOTIFICATIONS),
+                    false, this, UserHandle.USER_ALL);
             update();
         }
         
         @Override
-        public void onChange(boolean selfChange) {
+        public void onChange(boolean selfChange, Uri uri) {
             update();
+            if (uri.equals(Settings.Secure.getUriFor(
+                Settings.Secure.FP_SWIPE_TO_DISMISS_NOTIFICATIONS))) {
+                setFpToDismissNotifications();
+			}
         }
         
         public void update() {
@@ -517,6 +524,7 @@ public class StatusBar extends SystemUI implements DemoMode,
                     updateNavigationBar();
                 }
             }
+            setFpToDismissNotifications();
         }
     }
     private NavigationBarObserver mNavigationBarObserver = new NavigationBarObserver(mHandler);
@@ -4259,7 +4267,6 @@ public class StatusBar extends SystemUI implements DemoMode,
         updateReportRejectedTouchVisibility();
         updateDozing();
         updateTheme();
-        setFpToDismissNotifications();
         touchAutoDim();
         mNotificationShelf.setStatusBarState(state);
     }
