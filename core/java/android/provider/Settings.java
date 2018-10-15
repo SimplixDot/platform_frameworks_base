@@ -4367,6 +4367,37 @@ public final class Settings {
        /** @hide */
        public static final Validator STATUSBAR_CLOCK_DATE_FORMAT_VALIDATOR = ANY_STRING_VALIDATOR;
 
+       /**
+        * Change OmniJaws icon pack
+        *
+        * @hide
+        */
+       public static final String OMNIJAWS_WEATHER_ICON_PACK = "omnijaws_weather_icon_pack";
+        /** @hide */
+       private static final Validator OMNIJAWS_WEATHER_ICON_PACK_VALIDATOR =
+               ANY_STRING_VALIDATOR;
+
+        /**
+         * @hide
+         */
+        public static final String OMNI_LOCKSCREEN_WEATHER_ENABLED = "lockscreen_weather_enabled";
+
+        /** @hide */
+        private static final Validator OMNI_LOCKSCREEN_WEATHER_ENABLED_VALIDATOR =
+                BOOLEAN_VALIDATOR;
+
+        /**
+         * Status bar weather temperature
+         * 0: Hide the temperature
+         * 1: Display the temperature with scale and image
+         * 2: Display the temperature without scale and with image
+         * 3: Display the temparature with scale and without image
+         * 4: Display the temperature without scale and without image
+         * 5: Display the temperature image
+         * @hide
+         */
+        public static final String STATUS_BAR_SHOW_WEATHER_TEMP = "statusbar_show_weather_temp";
+
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
@@ -4428,6 +4459,8 @@ public final class Settings {
             STATUSBAR_CLOCK_DATE_DISPLAY,
             STATUSBAR_CLOCK_DATE_STYLE,
             STATUSBAR_CLOCK_DATE_FORMAT
+            OMNIJAWS_WEATHER_ICON_PACK
+            OMNI_LOCKSCREEN_WEATHER_ENABLED
             ACCELEROMETER_ROTATION,
             SHOW_BATTERY_PERCENT,
             NOTIFICATION_VIBRATION_INTENSITY,
@@ -4557,6 +4590,8 @@ public final class Settings {
             PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_DISPLAY);
             PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_STYLE);
             PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_FORMAT);
+            PRIVATE_SETTINGS.add(OMNIJAWS_WEATHER_ICON_PACK);
+            PRIVATE_SETTINGS.add(OMNI_LOCKSCREEN_WEATHER_ENABLED);
         }
 
         /**
@@ -4652,6 +4687,8 @@ public final class Settings {
             VALIDATORS.put(WIFI_STATIC_DNS1, WIFI_STATIC_DNS1_VALIDATOR);
             VALIDATORS.put(WIFI_STATIC_DNS2, WIFI_STATIC_DNS2_VALIDATOR);
             VALIDATORS.put(SHOW_BATTERY_PERCENT, SHOW_BATTERY_PERCENT_VALIDATOR);
+            VALIDATORS.put(OMNIJAWS_WEATHER_ICON_PACK, OMNIJAWS_WEATHER_ICON_PACK_VALIDATOR);
+            VALIDATORS.put(OMNI_LOCKSCREEN_WEATHER_ENABLED, OMNI_LOCKSCREEN_WEATHER_ENABLED_VALIDATOR);
         }
 
         /**

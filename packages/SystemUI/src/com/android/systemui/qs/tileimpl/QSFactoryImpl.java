@@ -44,6 +44,8 @@ import com.android.systemui.qs.tiles.NightDisplayTile;
 import com.android.systemui.qs.tiles.RotationLockTile;
 import com.android.systemui.qs.tiles.SmartPixelsTile;
 import com.android.systemui.qs.tiles.UserTile;
+import com.android.systemui.qs.tiles.VolumeTile;
+import com.android.systemui.qs.tiles.WeatherTile;
 import com.android.systemui.qs.tiles.WifiTile;
 import com.android.systemui.qs.tiles.WorkModeTile;
 import com.android.systemui.qs.QSTileHost;
@@ -113,6 +115,8 @@ public class QSFactoryImpl implements QSFactory {
                 return new PowerTile(mHost);
             case "expanded_desktop":
                 return new ExpandedDesktopTile(mHost);
+            case "weather":
+                return new WeatherTile(mHost);
         }
 
         // Intent tiles.
