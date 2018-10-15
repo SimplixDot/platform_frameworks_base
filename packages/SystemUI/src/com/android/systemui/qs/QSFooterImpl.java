@@ -34,6 +34,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -63,7 +64,7 @@ import com.android.systemui.statusbar.policy.UserInfoController.OnUserInfoChange
 import com.android.systemui.tuner.TunerService;
 
 public class QSFooterImpl extends FrameLayout implements QSFooter,
-        OnClickListener, OnUserInfoChangedListener, EmergencyListener, SignalCallback {
+        OnClickListener,  OnLongClickListener, OnUserInfoChangedListener, EmergencyListener, SignalCallback {
 
     private ActivityStarter mActivityStarter;
     private UserInfoController mUserInfoController;
@@ -98,6 +99,7 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
     private final int mColorForeground;
     private final CellSignalState mInfo = new CellSignalState();
     private OnClickListener mExpandClickListener;
+    protected Vibrator mVibrator;
 
     public QSFooterImpl(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -118,6 +120,7 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
         mSettingsButton = findViewById(R.id.settings_button);
         mSettingsContainer = findViewById(R.id.settings_button_container);
         mSettingsButton.setOnClickListener(this);
+        mSettingsButton.setOnLongClickListener(this);
 
         mMobileGroup = findViewById(R.id.mobile_combo);
         mMobileSignal = findViewById(R.id.mobile_signal);
@@ -131,6 +134,7 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
 
         mDragHandle = findViewById(R.id.qs_drag_handle_view);
         mActionsContainer = findViewById(R.id.qs_footer_actions_container);
+        mVibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
 
         // RenderThread is doing more harm than good when touching the header (to expand quick
         // settings), so disable it for this view
@@ -165,6 +169,12 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
     protected void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         updateResources();
+    }
+
+    public void vibrateheader(int duration) {
+        if (mVibrator != null) {
+            if (mVibrator.hasVibrator()) { mVibrator.vibrate(duration); }
+        }
     }
 
     @Override
@@ -370,6 +380,11 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
                 true /* dismissShade */);
     }
 
+    public boolean onLongClick(View v) {
+        if (v == mSettingsButton) {
+            startSimplixSettingsActivity();
+            vibrateheader(20);
+
     @Override
     public void setEmergencyCallsOnly(boolean show) {
         boolean changed = show != mShowEmergencyCallsOnly;
@@ -379,6 +394,13 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
                 updateEverything();
             }
         }
+    }
+
+    private void startSimplixSettingsActivity() {
+        Intent nIntent = new Intent(Intent.ACTION_MAIN);
+        nIntent.setClassName("com.android.settings",
+            "com.android.settings.Settings$GalaxySettingsActivity");
+        mActivityStarter.startActivity(nIntent, true /* dismissShade */);
     }
 
     @Override

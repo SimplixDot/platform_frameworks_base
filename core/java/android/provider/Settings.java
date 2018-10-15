@@ -3106,7 +3106,7 @@ public final class Settings {
          * Unlock keystore with fingerprint after reboot
          * @hide
          */
-         
+
         public static final String FP_UNLOCK_KEYSTORE = "fp_unlock_keystore";
 
         /**
@@ -4262,12 +4262,96 @@ public final class Settings {
          * @hide
          */
         public static final String QS_TILE_HIDE_TITLE = "qs_tile_hide_title";
-        
+
         /**
          * Whether navigation bar is enabled or not
          * @hide
          */
         public static final String NAVIGATION_BAR_SHOW = "navigation_bar_show";
+
+        /**
+        * Show or hide clock
+        * 0 - hide
+        * 1 - show (default)
+        * @hide
+        */
+       public static final String STATUS_BAR_CLOCK = "status_bar_clock";
+
+       /** @hide */
+       public static final Validator STATUS_BAR_CLOCK_VALIDATOR = BOOLEAN_VALIDATOR;
+
+       /**
+        * Style of clock
+        * 0 - Left Clock (default)
+        * 1 - Center Clock
+        * 2 - Right Clock
+        * @hide
+        */
+       public static final String STATUSBAR_CLOCK_STYLE = "statusbar_clock_style";
+
+       /** @hide */
+       public static final Validator STATUSBAR_CLOCK_STYLE_VALIDATOR =
+               new SettingsValidators.InclusiveIntegerRangeValidator(0, 2);
+
+       /**
+        * Whether to show seconds next to clock in status bar
+        * 0 - hide (default)
+        * 1 - show
+        * @hide
+        */
+       public static final String STATUS_BAR_CLOCK_SECONDS = "status_bar_clock_seconds";
+
+       /** @hide */
+       public static final Validator STATUS_BAR_CLOCK_SECONDS_VALIDATOR = BOOLEAN_VALIDATOR;
+
+       /**
+        * AM/PM Style for clock options
+        * 0 - Normal AM/PM
+        * 1 - Small AM/PM
+        * 2 - No AM/PM  (default)
+        * @hide
+        */
+       public static final String STATUSBAR_CLOCK_AM_PM_STYLE = "statusbar_clock_am_pm_style";
+
+       /** @hide */
+       public static final Validator STATUSBAR_CLOCK_AM_PM_STYLE_VALIDATOR =
+               new SettingsValidators.InclusiveIntegerRangeValidator(0, 2);
+
+       /**
+        * Shows custom date before clock time
+        * 0 - No Date
+        * 1 - Small Date
+        * 2 - Normal Date
+        * @hide
+        */
+       public static final String STATUSBAR_CLOCK_DATE_DISPLAY = "statusbar_clock_date_display";
+
+       /** @hide */
+       public static final Validator STATUSBAR_CLOCK_DATE_DISPLAY_VALIDATOR =
+               new SettingsValidators.InclusiveIntegerRangeValidator(0, 2);
+
+       /**
+        * Sets the date string style
+        * 0 - Regular style
+        * 1 - Lowercase
+        * 2 - Uppercase
+        * @hide
+        */
+       public static final String STATUSBAR_CLOCK_DATE_STYLE = "statusbar_clock_date_style";
+
+       /** @hide */
+       public static final Validator STATUSBAR_CLOCK_DATE_STYLE_VALIDATOR =
+               new SettingsValidators.InclusiveIntegerRangeValidator(0, 2);
+
+
+       /**
+        * Stores the java DateFormat string for the date
+        * @hide
+        */
+       public static final String STATUSBAR_CLOCK_DATE_FORMAT = "statusbar_clock_date_format";
+
+       /** @hide */
+       public static final Validator STATUSBAR_CLOCK_DATE_FORMAT_VALIDATOR = ANY_STRING_VALIDATOR;
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
@@ -4323,6 +4407,13 @@ public final class Settings {
             RINGTONE,
             LOCK_TO_APP_ENABLED,
             NOTIFICATION_SOUND,
+            STATUS_BAR_CLOCK,
+            STATUSBAR_CLOCK_STYLE,
+            STATUS_BAR_CLOCK_SECONDS,
+            STATUSBAR_CLOCK_AM_PM_STYLE,
+            STATUSBAR_CLOCK_DATE_DISPLAY,
+            STATUSBAR_CLOCK_DATE_STYLE,
+            STATUSBAR_CLOCK_DATE_FORMAT
             ACCELEROMETER_ROTATION,
             SHOW_BATTERY_PERCENT,
             NOTIFICATION_VIBRATION_INTENSITY,
@@ -4445,6 +4536,13 @@ public final class Settings {
             PRIVATE_SETTINGS.add(QS_LAYOUT_COLUMNS);
             PRIVATE_SETTINGS.add(QS_LAYOUT_COLUMNS_LANDSCAPE);
             PRIVATE_SETTINGS.add(QS_TILE_HIDE_TITLE);
+            PRIVATE_SETTINGS.add(STATUS_BAR_CLOCK);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_STYLE);
+            PRIVATE_SETTINGS.add(STATUS_BAR_CLOCK_SECONDS);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_AM_PM_STYLE);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_DISPLAY);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_STYLE);
+            PRIVATE_SETTINGS.add(STATUSBAR_CLOCK_DATE_FORMAT);
         }
 
         /**
@@ -4464,6 +4562,13 @@ public final class Settings {
             VALIDATORS.put(BLUETOOTH_DISCOVERABILITY_TIMEOUT,
                     BLUETOOTH_DISCOVERABILITY_TIMEOUT_VALIDATOR);
             VALIDATORS.put(NEXT_ALARM_FORMATTED, NEXT_ALARM_FORMATTED_VALIDATOR);
+            VALIDATORS.put(STATUS_BAR_CLOCK, STATUS_BAR_CLOCK_VALIDATOR);
+            VALIDATORS.put(STATUSBAR_CLOCK_STYLE, STATUSBAR_CLOCK_STYLE_VALIDATOR);
+            VALIDATORS.put(STATUS_BAR_CLOCK_SECONDS, STATUS_BAR_CLOCK_SECONDS_VALIDATOR);
+            VALIDATORS.put(STATUSBAR_CLOCK_AM_PM_STYLE, STATUSBAR_CLOCK_AM_PM_STYLE_VALIDATOR);
+            VALIDATORS.put(STATUSBAR_CLOCK_DATE_DISPLAY, STATUSBAR_CLOCK_DATE_DISPLAY_VALIDATOR);
+            VALIDATORS.put(STATUSBAR_CLOCK_DATE_STYLE, STATUSBAR_CLOCK_DATE_STYLE_VALIDATOR);
+            VALIDATORS.put(STATUSBAR_CLOCK_DATE_FORMAT, STATUSBAR_CLOCK_DATE_FORMAT_VALIDATOR);
             VALIDATORS.put(FONT_SCALE, FONT_SCALE_VALIDATOR);
             VALIDATORS.put(DIM_SCREEN, DIM_SCREEN_VALIDATOR);
             VALIDATORS.put(DISPLAY_COLOR_MODE, DISPLAY_COLOR_MODE_VALIDATOR);
@@ -6969,7 +7074,7 @@ public final class Settings {
          */
         public static final String SEARCH_GLOBAL_SEARCH_ACTIVITY =
                 "search_global_search_activity";
-                
+
         /**
          * Disable hw buttons - actions, brightness, haptic feedback, overflow menu
          * @hide
@@ -7327,13 +7432,13 @@ public final class Settings {
          * @hide
          */
         public static final int THEME_MODE_DARK = 2;
-        
+
         /**
          * THEME_MODE value for black theme mode.
          * @hide
          */
         public static final int THEME_MODE_BLACK = 3;
-        
+
         /**
          * THEME_MODE value for Simplix Blue theme mode.
          * @hide
@@ -7940,7 +8045,7 @@ public final class Settings {
                 "system_navigation_keys_enabled";
 
         private static final Validator SYSTEM_NAVIGATION_KEYS_ENABLED_VALIDATOR = BOOLEAN_VALIDATOR;
-        
+
         /**
          * Wheter to dismiss notifications on fingerprint left and right swipe action
          * @hide
