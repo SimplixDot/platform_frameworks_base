@@ -75,7 +75,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     // Statusbar Weather Image
     private View mWeatherImageView;
     private View mWeatherTextView;
-    private int mShowWeather
+    private int mShowWeather;
 
     private class SettingsObserver extends ContentObserver {
        SettingsObserver(Handler handler) {
@@ -83,9 +83,6 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
        }
 
        void observe() {
-         mContentResolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.STATUS_BAR_LOGO),
-                    false, this, UserHandle.USER_ALL)
          mContentResolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUSBAR_CLOCK_STYLE),
                     false, this, UserHandle.USER_ALL);
@@ -285,12 +282,10 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
      * Animate a view to INVISIBLE or GONE
      * Hides a view.
      */
-    private void animateHiddenState(final View v, int state, boolean animate) {
     private void animateHide(final View v, boolean animate, final boolean invisible) {
         v.animate().cancel();
         if (!animate) {
             v.setAlpha(0f);
-            v.setVisibility(state);
             v.setVisibility(invisible ? View.INVISIBLE : View.GONE);
             return;
         }

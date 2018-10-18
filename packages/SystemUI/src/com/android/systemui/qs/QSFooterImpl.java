@@ -28,6 +28,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
 import android.os.Bundle;
 import android.os.UserManager;
+import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
@@ -384,6 +385,9 @@ public class QSFooterImpl extends FrameLayout implements QSFooter,
         if (v == mSettingsButton) {
             startSimplixSettingsActivity();
             vibrateheader(20);
+    	}
+    	return false;
+    }
 
     @Override
     public void setEmergencyCallsOnly(boolean show) {
