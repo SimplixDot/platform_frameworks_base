@@ -31,7 +31,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.ImageSwitcher;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.util.Slog;
 
 import com.android.systemui.Dependency;
 import com.android.systemui.Interpolators;
@@ -76,6 +79,24 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     private View mWeatherImageView;
     private View mWeatherTextView;
     private int mShowWeather;
+    
+    private ImageView mSimplixLogo;
+    private boolean mShowLogo;
+     private class SimplixSettingsObserver extends ContentObserver {
+        SimplixSettingsObserver(Handler handler) {
+            super(handler);
+        }
+         void observe() {
+            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_LOGO),
+                    false, this, UserHandle.USER_ALL);
+        }
+         @Override
+        public void onChange(boolean selfChange) {
+            updateLogoSettings(true);
+        }
+    }
+    private SimplixSettingsObserver mSimplixSettingsObserver = new SimplixSettingsObserver(mHandler);
 
     private class SettingsObserver extends ContentObserver {
        SettingsObserver(Handler handler) {
@@ -136,9 +157,12 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
         mClockView = mStatusBar.findViewById(R.id.clock);
         mCenterClockLayout = (LinearLayout) mStatusBar.findViewById(R.id.center_clock_layout);
         mRightClock = mStatusBar.findViewById(R.id.right_clock);
+        mSimplixLogo = (ImageView) mStatusBar.findViewById(R.id.status_bar_logo);
+        Dependency.get(DarkIconDispatcher.class).addDarkReceiver(mSimplixLogo);
         mWeatherTextView = mStatusBar.findViewById(R.id.weather_temp);
         mWeatherImageView = mStatusBar.findViewById(R.id.weather_image);
         updateSettings(false);
+        updateLogoSettings(false);
         showSystemIconArea(false);
         initEmergencyCryptkeeperText();
         initOperatorName();
@@ -166,6 +190,7 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
     public void onDestroyView() {
         super.onDestroyView();
         Dependency.get(StatusBarIconController.class).removeIconGroup(mDarkIconManager);
+        Dependency.get(DarkIconDispatcher.class).removeDarkReceiver(mSimplixLogo);
         if (mNetworkController.hasEmergencyCryptKeeperText()) {
             mNetworkController.removeCallback(mSignalCallback);
         }
@@ -263,6 +288,9 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
 
     public void showNotificationIconArea(boolean animate) {
         animateShow(mNotificationIconAreaInner, animate);
+        if (mShowLogo) {
+			animateShow(mSimplixLogo, animate);
+		}
         animateShow(mCenterClockLayout, animate);
     }
 
@@ -362,6 +390,26 @@ public class CollapsedStatusBarFragment extends Fragment implements CommandQueue
             animateHide(mClockView, animate, false);
         } else {
             animateShow(mClockView, animate);
+        }
+    }
+    
+    public void updateLogoSettings(boolean animate) {
+        try {
+            mShowLogo = Settings.System.getIntForUser(
+                getContext().getContentResolver(), Settings.System.STATUS_BAR_LOGO, 0,
+                UserHandle.USER_CURRENT) == 1;
+            if (mNotificationIconAreaInner != null) {
+                if (mShowLogo) {
+                    if (mNotificationIconAreaInner.getVisibility() == View.VISIBLE) {
+                        animateShow(mSimplixLogo, animate);
+                    }
+                } else {
+                    animateHide(mSimplixLogo, animate, false);
+                }
+            }
+        } catch (Exception e) {
+            // never ever crash here
+            Slog.e(TAG, "updateLogoSettings(animate)", e);
         }
     }
 }

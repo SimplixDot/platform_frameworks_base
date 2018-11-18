@@ -4397,6 +4397,11 @@ public final class Settings {
          * @hide
          */
         public static final String STATUS_BAR_SHOW_WEATHER_TEMP = "statusbar_show_weather_temp";
+        
+        /**
+         * @hide
+         */
+        public static final String STATUS_BAR_LOGO = "status_bar_logo";
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
